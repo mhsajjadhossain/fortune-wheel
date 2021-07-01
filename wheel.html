@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Wheel of Fortune Bingo</title>
+
+    <style type="text/css">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .buttonWrapper {
+            display: none;
+        }
+
+        .wheelWrap {
+            width: 1170px;
+            margin: 0 auto;
+        }
+
+        .chartholder {
+            stroke: #fff;
+            stroke-width: 3px;
+        }
+
+        text {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 11px;
+            pointer-events: none;
+            stroke: none !important;
+        }
+
+        #chart {
+            width: 45%;
+        }
+
+        #question {
+            width: 55%;
+            top: 0;
+        }
+
+        #question h1 {
+            font-size: 50px;
+            font-weight: bold;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            color: #fff;
+            text-transform: capitalize;
+        }
+
+        #question h1.win {
+            text-shadow: 0px 0px 9px #235379, 0px 0px 18px #87C1E8 !important;
+            color: #fff;
+        }
+
+        #question h1.warn {
+            text-shadow: 0px 0px 9px #717923, 0px 0px 18px #e8de87;
+            color: rgb(254, 255, 182);
+        }
+
+        #question p {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            padding: 0;
+            margin: 0;
+            color: #f1f1f1;
+            margin-top: 20px;
+            line-height: 1.44;
+            font-size: 20px;
+        }
+
+        .wheel_wrapper {
+            background: #364156;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            left: 0;
+            top: -100%;
+            opacity: 0;
+            visibility: hidden;
+            /* transform: scale(0); */
+            transition: all .3s linear;
+            z-index: 99;
+        }
+
+        .wheel_wrapper.active {
+            top: 0;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .wheel_container {
+            display: flex;
+            align-items: center;
+            padding: 0 80px;
+            width: 70%;
+            margin: 0 auto;
+        }
+
+        .slice text {
+            font-size: 16px;
+            fill: #fff;
+        }
+
+        .buttonWrapper a {
+            background: #21bf73;
+            color: #fff;
+            text-decoration: none;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            padding: 15px 20px;
+            display: inline-block;
+            margin-top: 15px;
+            margin-right: 15px;
+        }
+
+        image.middleCircle {
+            x: -8%;
+            y: -5%;
+        }
+
+        .emailWrapper {
+            margin-top: 30px;
+        }
+
+        .singleInputw input {
+            background: #fff;
+            width: 100%;
+            display: block;
+            border: 1px solid #fff;
+            padding: 17px 20px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            display: block;
+        }
+
+        button.subEBtn {
+            background: #29B51F;
+            color: #fff;
+            border: 0;
+            display: block;
+            width: 100%;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 30px;
+            margin-top: 17px;
+            cursor: pointer;
+        }
+
+        .openWheel {
+            border: 0;
+            width: 80px;
+            height: 80px;
+            position: fixed;
+            right: 30px;
+            bottom: 30px;
+            border-radius: 50%;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .openWheel img {
+            width: 100%;
+        }
+        button.closeBtn {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: inline-block;
+            width: 30px;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+        }
+    </style>
+    <style type="text/css">
+        @media (min-width: 992px) and (max-width: 1500px) {
+            .wheel_container {
+                width: 100%;
+                padding: 0 40px;
+            }
+            #question {
+                padding-left: 40px;
+            }
+            #chart{
+                text-align: center;
+            }
+        }
+        @media (min-width: 768px) and (max-width: 991px) {
+            .wheel_container {
+                width: 100%;
+                padding: 0 30px;
+                flex-direction: column;
+            }
+            #chart,
+            #question{
+                width: 70%;
+                text-align:center;
+            }
+            .wheel_wrapper {
+                overflow-y: auto;
+            }
+        }
+        @media only screen and (max-width: 575px) {
+            .wheel_container {
+                width: 100%;
+                padding: 0 15px;
+                flex-direction: column;
+            }
+            #chart,
+            #question{
+                width: 100%;
+                text-align:center;
+            }
+            .wheel_wrapper {
+                overflow-y: auto;
+            }
+            #question {
+                padding: 15px 0 80px 0;
+            }
+            #question h1 {
+                font-size: 32px;
+            }
+            #chart svg {
+                width: 345px;
+                height: 500px;
+            }
+            .chartholder {
+                scale: 66%;
+                transform: translate(69%,102%);
+            }
+            .selectorPin {
+                transform: translate(100% , 68%);
+            }
+            image.middleCircle {
+                x: -11%;
+                y: -5%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wheel_wrapper active">
+        <button class="closeBtn">
+            <img src="img/cancel.svg" alt="cancel">
+        </button>
+
+
+        <div class="wheel_container">
+            <div id="chart"></div>
+            <div id="question">
+                <h1>Your Spacial Bonus Offer Has Been Unlocked</h1>
+                <p>Are you ready to try your luck? Then just spin the wheel </br>and win unbelievable offers and
+                    discounts now.</p>
+
+                <form class="emailWrapper" action="#">
+                    <div class="singleInputw">
+                        <input type="email" id="email" placeholder="Enter Your Email Here.." required>
+                    </div>
+                    <button class="subEBtn">Try Your Luck!</button>
+                </form>
+
+            </div>
+
+        </div>
+        <audio class="spinSound" src="https://greensock.com/uploads/pages_media/0_spin.mp3" paused></audio>
+        <audio class="winSound" src="./img/Firework_Magic_Hit.wav" paused></audio>
+    </div>
+
+    <button class="openWheel">
+        <img src="img/wheel-icon.png" alt="wheel-icon">
+    </button>
+
+
+
+
+
+
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+    <script>
+        let openBtn = document.querySelector('.openWheel');
+        let closeBtn = document.querySelector('.closeBtn');
+        let wheelWrap = document.querySelector('.wheel_wrapper');
+
+        openBtn.addEventListener('click', () => {
+            wheelWrap.classList.add('active')
+        })
+        closeBtn.addEventListener('click', () => {
+            wheelWrap.classList.remove('active')
+        })
+    </script>
+
+
+
+    <script type="text/javascript" charset="utf-8">
+        let eInput = document.querySelector('#email')
+        let heading = document.querySelector("#question h1");
+        let spinAudio = document.querySelector('.spinSound')
+        let winSound = document.querySelector('.winSound')
+        let qs = document.querySelector("#question h1")
+        let sBtn = document.querySelector(".subEBtn")
+
+        var data = [{
+                "label": "90% Off",
+                "value": 1,
+                "question": "You Have Get 90% Off On any Package below"
+            }, // padding
+            {
+                "label": "5% Off",
+                "value": 1,
+                "question": "You Have Get 5% Off On any Package below"
+            }, //font-family
+            {
+                "label": "Free Copier",
+                "value": 1,
+                "question": "You Have Get Free Copier For 3 months"
+            }, //color
+            {
+                "label": "25% Off",
+                "value": 1,
+                "question": "You Have Get 5% Off On any Package below"
+            }, //font-weight
+            {
+                "label": "30% Off",
+                "value": 1,
+                "question": "You Have Get 30% Off On any Package below"
+            }, //font-weight
+            {
+                "label": "35% Off",
+                "value": 1,
+                "question": "You Have Get 35% Off On any Package below"
+            }, //font-weight
+            {
+                "label": "45% Off",
+                "value": 1,
+                "question": "You Have Get 45% Off On any Package below"
+            },
+            {
+                "label": "60% Off",
+                "value": 1,
+                "question": "You Have Get 60% Off On any Package below"
+            }, //font-weight
+            {
+                "label": "Free EA",
+                "value": 1,
+                "question": "You Have Get Free Expert Advisor For 6 Months"
+            }, //font-weight
+            {
+                "label": "70% Off",
+                "value": 1,
+                "question": "You Have Get 70% Off On any Package below"
+            }, //font-weight
+            {
+                "label": "80% Off",
+                "value": 1,
+                "question": "You Have Get 80% Off On any Package below"
+            }
+        ];
+
+
+        let warner = () => {
+            sBtn.click()
+            heading.classList.add('warn');
+            heading.innerText = "Please Give Your Email Address To continue"
+            eInput.style.borderColor = "red"
+        }
+        let successM = () => {
+            heading.classList.remove('warn');
+            eInput.style.borderColor = "white";
+            let userAgent = window.navigator.userAgent;
+            console.log(userAgent)
+            console.log(eInput.value)
+            eInput.value = '';
+        }
+
+        sBtn.addEventListener("click", ()=>{
+            spin()
+        });
+
+        let ccode = (i) => {
+            let cData = [
+                '#235379',
+                "#246FA1",
+                "#87C1E8",
+                "#1C8AD5",
+                '#235379',
+                "#246FA1",
+                "#87C1E8",
+                "#1C8AD5",
+                '#235379',
+                "#246FA1",
+                "#87C1E8"
+            ]
+            return cData[i];
+        }
+        var padding = {
+                top: 20,
+                right: 40,
+                bottom: 0,
+                left: 0
+            },
+            w = 500 - padding.left - padding.right,
+            h = 500 - padding.top - padding.bottom,
+            r = Math.min(w, h) / 2,
+            rotation = 0,
+            oldrotation = 0,
+            picked = 100000,
+            oldpick = [],
+            color = ccode;
+        // color = d3.scale.category20b(); //category20c()
+        randomNumbers = getRandomNumbers();
+
+        //http://osric.com/bingo-card-generator/?title=HTML+and+CSS+BINGO!&words=padding%2Cfont-family%2Ccolor%2Cfont-weight%2Cfont-size%2Cbackground-color%2Cnesting%2Cbottom%2Csans-serif%2Cperiod%2Cpound+sign%2C%EF%B9%A4body%EF%B9%A5%2C%EF%B9%A4ul%EF%B9%A5%2C%EF%B9%A4h1%EF%B9%A5%2Cmargin%2C%3C++%3E%2C{+}%2C%EF%B9%A4p%EF%B9%A5%2C%EF%B9%A4!DOCTYPE+html%EF%B9%A5%2C%EF%B9%A4head%EF%B9%A5%2Ccolon%2C%EF%B9%A4style%EF%B9%A5%2C.html%2CHTML%2CCSS%2CJavaScript%2Cborder&freespace=true&freespaceValue=Web+Design+Master&freespaceRandom=false&width=5&height=5&number=35#results
+
+
+
+        var svg = d3.select('#chart')
+            .append("svg")
+            .data([data])
+            .attr("width", w + padding.left + padding.right)
+            .attr("height", h + padding.top + padding.bottom);
+
+        var container = svg.append("g")
+            .attr("class", "chartholder")
+            .attr("transform", "translate(" + (w / 2 + padding.left) + "," + (h / 2 + padding.top) + ")");
+
+        var vis = container
+            .append("g");
+
+        var pie = d3.layout.pie().sort(null).value(function (d) {
+            return 1;
+        });
+
+        // declare an arc generator function
+        var arc = d3.svg.arc().outerRadius(r);
+
+        // select paths, use arc generator to draw
+        var arcs = vis.selectAll("g.slice")
+            .data(pie)
+            .enter()
+            .append("g")
+            .attr("class", "slice");
+
+
+        arcs.append("path")
+            .attr("fill", function (d, i) {
+                return color(i);
+            })
+            .attr("d", function (d) {
+                console.log(arc(d))
+                return arc(d);
+            });
+
+        // add the text
+        arcs.append("text").attr("transform", function (d) {
+                d.innerRadius = 0;
+                d.outerRadius = r;
+                d.angle = (d.startAngle + d.endAngle) / 2;
+                return "rotate(" + (d.angle * 180 / Math.PI - 90) + ")translate(" + (d.outerRadius - 50) + ")";
+            })
+            .attr("text-anchor", "end")
+            .text(function (d, i) {
+                return data[i].label;
+
+            });
+
+        container.on("click", spin);
+
+
+        function spin(d) {
+
+            if (!eInput.value) {
+                return warner()
+            }
+            successM()
+            // If it has, play a sound
+            spinAudio.currentTime = 0;
+            spinAudio.loop = true;
+            spinAudio.play();
+
+            container.on("click", null);
+
+            //all slices have been seen, all done
+            console.log("OldPick: " + oldpick.length, "Data length: " + data.length);
+            if (oldpick.length == 1) {
+                // heading.innerText('Your Turn is Over. Apply The Coupon And Enjoy The Discount')
+                d3.select("#question h1")
+                    .text('Your Turn is Over. Apply The Coupon And Enjoy The Discount');
+                container.on("click", null);
+                spinAudio.pause();
+                return;
+            }
+
+            var ps = 360 / data.length,
+                pieslice = Math.round(1440 / data.length),
+                rng = Math.floor((Math.random() * 1440) + 360); // change this to define position
+
+            rotation = (Math.round(rng / ps) * ps);
+
+            picked = Math.round(data.length - (rotation % 360) / ps);
+            picked = picked >= data.length ? (picked % data.length) : picked;
+
+
+            if (oldpick.indexOf(picked) !== -1) {
+                d3.select(this).call(spin);
+                return;
+            } else {
+                oldpick.push(picked);
+            }
+
+            rotation += 90 - Math.round(ps / 2);
+
+            vis.transition()
+                .duration(2000)
+                .attrTween("transform", rotTween)
+                .each("end", function () {
+
+                    //mark question as seen
+                    d3.select(".slice:nth-child(" + (picked + 1) + ") path")
+                    // .attr("fill", "#111");
+
+
+                    qs.classList.add('win')
+                    //populate question
+                    d3.select("#question h1")
+                        .text(data[picked].question);
+
+                    console.log(data[picked].question)
+
+                    spinAudio.pause();
+                    // offerMaker(picked)
+                    winSound.currentTime = 0;
+                    winSound.play();
+
+                    oldrotation = rotation;
+
+
+                    container.on("click", spin);
+                });
+        }
+        
+        //make arrow
+        svg.append("g")
+            .attr("class","selectorPin")
+            .attr("transform", "translate(" + (w + padding.left + padding.right) + "," + ((h / 2) + padding.top) + ")")
+            .append("path")
+            .attr("d", "M-" + (r * .15) + ",0L0," + (r * .05) + "L0,-" + (r * .05) + "Z")
+            .style({
+                "fill": "#fff"
+            });
+
+        //draw spin circle
+        container.append("circle")
+            .attr("cx", 0)
+            .attr("cy", 0)
+            .attr("r", 60)
+            .style({
+                "fill": "white",
+                "cursor": "pointer"
+            });
+
+        //spin text
+        container.append("image")
+            .attr("x", 0)
+            .attr("y", 15)
+            .attr("href", "img/spin.png")
+            .attr("width", "80")
+            .attr("text-anchor", "middle")
+            .attr("class", "middleCircle")
+            .style({
+                "font-weight": "bold",
+                "font-size": "30px"
+            });
+
+
+        function rotTween(to) {
+            var i = d3.interpolate(oldrotation % 360, rotation);
+            return function (t) {
+                return "rotate(" + i(t) + ")";
+            };
+        }
+
+
+        function getRandomNumbers() {
+            var array = new Uint16Array(1000);
+            var scale = d3.scale.linear().range([360, 1440]).domain([0, 100000]);
+
+            if (window.hasOwnProperty("crypto") && typeof window.crypto.getRandomValues === "function") {
+                window.crypto.getRandomValues(array);
+                console.log("works");
+            } else {
+                //no support for crypto, get crappy random numbers
+                for (var i = 0; i < 1000; i++) {
+                    array[i] = Math.floor(Math.random() * 100000) + 1;
+                }
+            }
+
+            return array;
+        }
+    </script>
+</body>
+
+</html>
