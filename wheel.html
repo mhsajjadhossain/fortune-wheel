@@ -495,7 +495,7 @@
                 return color(i);
             })
             .attr("d", function (d) {
-                console.log(arc(d))
+               
                 return arc(d);
             });
 
@@ -539,7 +539,7 @@
             container.on("click", null);
 
             //all slices have been seen, all done
-            console.log("OldPick: " + oldpick.length, "Data length: " + data.length);
+            // console.log("OldPick: " + oldpick.length, "Data length: " + data.length);
             if (oldpick.length == 1) {
                 // heading.innerText('Your Turn is Over. Apply The Coupon And Enjoy The Discount')
                 d3.select("#question h1")
@@ -552,7 +552,7 @@
             var ps = 360 / data.length,
                 pieslice = Math.round(1440 / data.length)
 
-            console.log(rng)
+            // console.log(rng)
             // rotation range 
 
 
@@ -586,7 +586,7 @@
                     d3.select("#question h1")
                         .text(data[picked].question);
 
-                    console.log(data[picked].question)
+                    // console.log(data[picked].question)
 
                     spinAudio.pause();
                     // offerMaker(picked)
@@ -648,7 +648,7 @@
 
             if (window.hasOwnProperty("crypto") && typeof window.crypto.getRandomValues === "function") {
                 window.crypto.getRandomValues(array);
-                console.log("works");
+                // console.log("works");
             } else {
                 //no support for crypto, get crappy random numbers
                 for (var i = 0; i < 1000; i++) {
