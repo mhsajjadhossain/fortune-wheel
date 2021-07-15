@@ -168,6 +168,7 @@
         .openWheel img {
             width: 100%;
         }
+
         button.closeBtn {
             position: absolute;
             top: 30px;
@@ -178,6 +179,10 @@
             border: 0;
             cursor: pointer;
         }
+
+        .mt-15 {
+            margin-top: 15px;
+        }
     </style>
     <style type="text/css">
         @media (min-width: 992px) and (max-width: 1500px) {
@@ -185,59 +190,73 @@
                 width: 100%;
                 padding: 0 40px;
             }
+
             #question {
                 padding-left: 40px;
             }
-            #chart{
+
+            #chart {
                 text-align: center;
             }
         }
+
         @media (min-width: 768px) and (max-width: 991px) {
             .wheel_container {
                 width: 100%;
                 padding: 0 30px;
                 flex-direction: column;
             }
+
             #chart,
-            #question{
+            #question {
                 width: 70%;
-                text-align:center;
+                text-align: center;
             }
+
             .wheel_wrapper {
                 overflow-y: auto;
             }
         }
+
         @media only screen and (max-width: 575px) {
             .wheel_container {
                 width: 100%;
                 padding: 0 15px;
                 flex-direction: column;
             }
+
             #chart,
-            #question{
+            #question {
                 width: 100%;
-                text-align:center;
+                text-align: center;
             }
+
             .wheel_wrapper {
                 overflow-y: auto;
             }
+
             #question {
                 padding: 15px 0 80px 0;
             }
+
             #question h1 {
                 font-size: 32px;
             }
+
             #chart svg {
                 width: 345px;
                 height: 500px;
             }
+
             .chartholder {
                 scale: 66%;
-                transform: translate(69%,102%);
+                transform: translate(69%, 102%);
             }
+
             .selectorPin {
-                transform: translate(100% , 68%);
+                transform: translate(100%, 68%);
             }
+
             image.middleCircle {
                 x: -11%;
                 y: -5%;
@@ -247,7 +266,7 @@
 </head>
 
 <body>
-    <div class="wheel_wrapper">
+    <div class="wheel_wrapper active">
         <button class="closeBtn">
             <img src="img/cancel.svg" alt="cancel">
         </button>
@@ -262,6 +281,9 @@
 
                 <form class="emailWrapper" action="#">
                     <div class="singleInputw">
+                        <input type="text" id="name" placeholder="Enter Your Name Here.." required>
+                    </div>
+                    <div class="singleInputw mt-15">
                         <input type="email" id="email" placeholder="Enter Your Email Here.." required>
                     </div>
                     <button class="subEBtn">Try Your Luck!</button>
@@ -282,7 +304,7 @@
 
 
 
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
     <script>
@@ -302,11 +324,49 @@
 
     <script type="text/javascript" charset="utf-8">
         let eInput = document.querySelector('#email')
+        let nInput = document.querySelector('#name')
         let heading = document.querySelector("#question h1");
         let spinAudio = document.querySelector('.spinSound')
         let winSound = document.querySelector('.winSound')
         let qs = document.querySelector("#question h1")
         let sBtn = document.querySelector(".subEBtn")
+
+        const isEmail = (email) => {
+            if (!email) return;
+            const re =
+                /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
+        const showMessage = (msg, sel, war) => {
+            if (!msg) return;
+            let selector = document.querySelector(sel)
+            if (selector == null) return;
+            if (!war) {
+                selector.classList.add('win');
+            } else {
+                selector.classList.add('warn');
+            }
+            selector.innerText = msg;
+        }
+        var errMsg;
+        const formValidator = () => {
+            if (!eInput.value || !nInput.value) {
+                errMsg = "Invalid Input please check the felids again!";
+                showMessage(errMsg, '#question h1', true)
+                return false;
+            }
+            if (!isEmail(eInput.value)) {
+                errMsg = "Invalid Email Input please check again!";
+                showMessage(errMsg, '#question h1', true)
+                return false;
+            }
+            return true;
+        }
+
+
+
+        // console.log(formValidator())
+        sBtn.addEventListener('click', spin)
 
         var data = [{
                 "label": "90% Off",
@@ -314,49 +374,44 @@
                 "question": "You Have Get 90% Off On any Package below"
             }, // padding
             {
-                "label": "5% Off",
+                "label": "22% Off",
                 "value": 1,
-                "question": "You Have Get 5% Off On any Package below"
+                "question": "You Have Get 22% Off On any Package below"
             }, //font-family
+            {
+                "label": "Free E-Book",
+                "value": 1,
+                "question": "You Have Get Free E-Book"
+            }, //color
+            {
+                "label": "33% Off",
+                "value": 1,
+                "question": "You Have Get 33% Off On any Package below"
+            }, //font-weight
+            {
+                "label": "84% Off",
+                "value": 1,
+                "question": "You Have Get 84% Off On any Package below"
+            }, //font-weight
             {
                 "label": "Free Copier",
                 "value": 1,
-                "question": "You Have Get Free Copier For 3 months"
-            }, //color
-            {
-                "label": "25% Off",
-                "value": 1,
-                "question": "You Have Get 5% Off On any Package below"
+                "question": "You Have Get Free Copier"
             }, //font-weight
             {
-                "label": "30% Off",
+                "label": "44% Off",
                 "value": 1,
-                "question": "You Have Get 30% Off On any Package below"
-            }, //font-weight
-            {
-                "label": "35% Off",
-                "value": 1,
-                "question": "You Have Get 35% Off On any Package below"
-            }, //font-weight
-            {
-                "label": "45% Off",
-                "value": 1,
-                "question": "You Have Get 45% Off On any Package below"
+                "question": "You Have Get 44% Off On any Package below"
             },
             {
-                "label": "60% Off",
+                "label": "99% Off",
                 "value": 1,
-                "question": "You Have Get 60% Off On any Package below"
+                "question": "You Have Get 99% Off On any Package below"
             }, //font-weight
             {
-                "label": "Free EA",
+                "label": "73% Off",
                 "value": 1,
-                "question": "You Have Get Free Expert Advisor For 6 Months"
-            }, //font-weight
-            {
-                "label": "70% Off",
-                "value": 1,
-                "question": "You Have Get 70% Off On any Package below"
+                "question": "You Have Get 73% Off On any Package below"
             }, //font-weight
             {
                 "label": "80% Off",
@@ -366,24 +421,9 @@
         ];
 
 
-        let warner = () => {
-            sBtn.click()
-            heading.classList.add('warn');
-            heading.innerText = "Please Give Your Email Address To continue"
-            eInput.style.borderColor = "red"
-        }
-        let successM = () => {
-            heading.classList.remove('warn');
-            eInput.style.borderColor = "white";
-            let userAgent = window.navigator.userAgent;
-            console.log(userAgent)
-            console.log(eInput.value)
-            eInput.value = '';
-        }
-
-        sBtn.addEventListener("click", ()=>{
-            spin()
-        });
+        // sBtn.addEventListener("click", ()=>{
+        //     spin()
+        // });
 
         let ccode = (i) => {
             let cData = [
@@ -475,13 +515,23 @@
         container.on("click", spin);
 
 
-        function spin(d) {
+        async function spin(d) {
 
-            if (!eInput.value) {
-                return warner()
-            }
-            successM()
+
+            if (!formValidator()) return;
+            // console.log(rangeResults())
             // If it has, play a sound
+
+            var rng;
+            await axios.post('https://lucky.priceactionltd.com/api/site-wise-coupon-usage', {
+                    site_id: '2',
+                    customer_name: nInput.value,
+                    customer_email: eInput.value
+                })
+                .then(function (response) {
+                    rng = response.data.description;
+                })
+
             spinAudio.currentTime = 0;
             spinAudio.loop = true;
             spinAudio.play();
@@ -493,15 +543,18 @@
             if (oldpick.length == 1) {
                 // heading.innerText('Your Turn is Over. Apply The Coupon And Enjoy The Discount')
                 d3.select("#question h1")
-                    .text('Your Turn is Over. Apply The Coupon And Enjoy The Discount');
+                    .text('Your Turn is Over. Check your email for the coupon you won');
                 container.on("click", null);
                 spinAudio.pause();
                 return;
             }
 
             var ps = 360 / data.length,
-                pieslice = Math.round(1440 / data.length),
-                rng = Math.floor((Math.random() * 1440) + 360); // change this to define position
+                pieslice = Math.round(1440 / data.length)
+
+            console.log(rng)
+            // rotation range 
+
 
             rotation = (Math.round(rng / ps) * ps);
 
@@ -546,10 +599,10 @@
                     container.on("click", spin);
                 });
         }
-        
+
         //make arrow
         svg.append("g")
-            .attr("class","selectorPin")
+            .attr("class", "selectorPin")
             .attr("transform", "translate(" + (w + padding.left + padding.right) + "," + ((h / 2) + padding.top) + ")")
             .append("path")
             .attr("d", "M-" + (r * .15) + ",0L0," + (r * .05) + "L0,-" + (r * .05) + "Z")
